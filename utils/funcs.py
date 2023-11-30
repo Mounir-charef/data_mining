@@ -26,8 +26,8 @@ def data_study(df: pd.DataFrame):
 
 def get_transaction_df(df: pd.DataFrame):
     return df.groupby("Watcher").agg({
-        'videoCategoryId': lambda x: set(x),
-        'videoCategoryLabel': lambda x: set(x)
+        'videoCategoryId': set,
+        'videoCategoryLabel': set
     }).sort_values(by='videoCategoryId', key=lambda x: x.apply(len), ascending=False).rename(
         columns={'Watcher': 'Transaction', 'videoCategoryId': 'Items', 'videoCategoryLabel': 'Items_Labels'})
 
