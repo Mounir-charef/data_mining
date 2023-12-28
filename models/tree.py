@@ -3,11 +3,14 @@ from models.metrics import metric_functions, Metric
 
 
 class DecisionTree:
-    def __init__(self, max_depth=None):
+    def __init__(self, max_depth=150, max_features=None):
         self.tree = None
         self.max_depth = max_depth
+        self.max_features = max_features
 
     def fit(self, x, y):
+        if self.max_features is not None:
+            x = x.sample(self.max_features, axis=1)
         self.tree = self._build_tree(x, y, 0)
 
     def _build_tree(self, x, y, depth):

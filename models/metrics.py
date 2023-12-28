@@ -1,5 +1,7 @@
 import numpy as np
 from typing import Literal
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 Average = Literal['macro', 'micro', 'weighted', 'binary']
 
@@ -145,6 +147,7 @@ def print_confusion_matrix(y_true, y_pred, classes=None):
     print('  ' + ' '.join([f'{c:^4}' for c in classes]))
     for i, c1 in enumerate(classes):
         print(f'{c1} ' + ' '.join([f'{matrix[i][j]:^4}' for j, c2 in enumerate(classes)]))
+
 
 metric_functions = {
     'accuracy': accuracy_score,
