@@ -14,11 +14,11 @@ def metrics_by_class(y_true, y_pred, classes):
         fn = np.sum((y_true == c) & (y_pred != c))
         matrices[c] = [[tp, fp], [fn, tn]]
         metrics[c] = {
-            'accuracy': (tp + tn) / (tp + tn + fp + fn),
-            'precision': tp / (tp + fp),
-            'recall': tp / (tp + fn),
-            'f1-score': 2 * tp / (2 * tp + fp + fn),
-            'specificity': tn / (tn + fp)
+            'accuracy': (tp + tn) / (tp + tn + fp + fn) if tp + tn + fp + fn > 0 else 0,
+            'precision': tp / (tp + fp) if tp + fp > 0 else 0,
+            'recall': tp / (tp + fn) if tp + fn > 0 else 0,
+            'f1-score': 2 * tp / (2 * tp + fp + fn) if tp + fp + fn > 0 else 0,
+            'specificity': tn / (tn + fp) if tn + fp > 0 else 0
         }
     return metrics, matrices
 
@@ -124,6 +124,27 @@ def specificity_score(y_true, y_pred, *, average: Average = 'macro'):
         case _:
             raise ValueError(f'Invalid average {average!r}')
 
+
+def global_confusion_matrix(y_true, y_pred, classes=None):
+    if classes is None:
+        classes = np.unique(y_true)
+
+    matrix = np.zeros((len(classes), len(classes)), dtype=int)
+    for i, c1 in enumerate(classes):
+        for j, c2 in enumerate(classes):
+            matrix[i][j] = np.sum((y_true == c1) & (y_pred == c2))
+    return matrix
+
+
+def print_confusion_matrix(y_true, y_pred, classes=None):
+    if classes is None:
+        classes = np.unique(y_true)
+
+    matrix = global_confusion_matrix(y_true, y_pred, classes)
+    print('Confusion matrix:')
+    print('  ' + ' '.join([f'{c:^4}' for c in classes]))
+    for i, c1 in enumerate(classes):
+        print(f'{c1} ' + ' '.join([f'{matrix[i][j]:^4}' for j, c2 in enumerate(classes)]))
 
 metric_functions = {
     'accuracy': accuracy_score,
