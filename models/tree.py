@@ -3,15 +3,17 @@ from models.metrics import metric_functions, Metric
 
 
 class DecisionTree:
-    def __init__(self):
+    def __init__(self, max_depth=None):
         self.tree = None
+        self.max_depth = max_depth
 
     def fit(self, x, y):
-        self.tree = self._build_tree(x, y)
+        self.tree = self._build_tree(x, y, 0)
 
-    def _build_tree(self, x, y):
-        if len(np.unique(y)) == 1:
-            # If all labels are the same, create a leaf node
+    def _build_tree(self, x, y, depth):
+        if len(np.unique(y)) == 1 or depth == self.max_depth or len(np.unique(y)) == 1:
+            # If all labels are the same, create a leaf node or max depth reached or all labels are the same,
+            # create a leaf node
             return {'label': y.iloc[0]}
 
         if len(x.columns) == 0:
@@ -30,8 +32,8 @@ class DecisionTree:
         right_mask = ~left_mask
 
         # Recursively build the left and right subtrees
-        left_tree = self._build_tree(x[left_mask], y[left_mask])
-        right_tree = self._build_tree(x[right_mask], y[right_mask])
+        left_tree = self._build_tree(x[left_mask], y[left_mask], depth + 1)
+        right_tree = self._build_tree(x[right_mask], y[right_mask], depth + 1)
 
         # Return a node representing the split
         return {'feature': best_feature, 'threshold': best_threshold,
@@ -89,3 +91,6 @@ class DecisionTree:
         else:
             # Recur on the right subtree
             return self._predict_single(instance, node['right'])
+
+    def __repr__(self):
+        return f'DecisionTree(max_depth={self.max_depth})'

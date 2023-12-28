@@ -2,7 +2,7 @@ from models.utils import Strategy, strategies
 import pandas as pd
 import numpy as np
 from collections import Counter
-from sklearn.metrics import accuracy_score
+from models.metrics import metric_functions, Metric
 
 
 class KNN:
@@ -45,11 +45,11 @@ class KNN:
         indexes = np.argsort(distances)[:self.k]
         return Counter(self.y.values[indexes]).most_common(1)[0][0]
 
-    def score(self, x: pd.DataFrame, y: pd.Series):
+    def score(self, x: pd.DataFrame, y: pd.Series, *, metric: Metric = 'accuracy'):
         if self.x is None or self.y is None:
             raise ValueError("Model has not been fitted. Please call the `fit` method before scoring.")
 
-        return accuracy_score(y, self.predict(x))
+        return metric_functions[metric](y, self.predict(x))
 
     def __repr__(self):
         return f'KNN(strategy={self.strategy.__name__}, k={self.k})'

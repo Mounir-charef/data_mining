@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.utils import resample
+from models.metrics import Metric, metric_functions
 from models.tree import DecisionTree
-from tqdm import tqdm
 
 
 class RandomForest:
@@ -20,10 +20,12 @@ class RandomForest:
             self.trees.append(tree)
 
     def predict(self, x):
-        predictions = np.array([tree.predict(x) for tree in tqdm(self.trees)])
+        predictions = np.array([tree.predict(x) for tree in self.trees])
         return np.mean(predictions, axis=0) >= 0.5
 
-    def score(self, x, y):
+    def score(self, x, y, *, metric: Metric = 'accuracy'):
         predictions = self.predict(x)
-        accuracy = np.sum(predictions == y) / len(y)
-        return accuracy
+        return metric_functions[metric](y, predictions)
+
+    def __repr__(self):
+        return f'RandomForest(n_trees={self.n_trees}, max_depth={self.max_depth})'
