@@ -1,5 +1,5 @@
-from enum import Enum
 import numpy as np
+from typing import Literal
 
 
 def euclidean_distance(x, y):
@@ -22,9 +22,12 @@ def hamming_distance(x, y):
     return np.sum(x != y)
 
 
-class Func(Enum):
-    euclidean = euclidean_distance
-    manhattan = manhattan_distance
-    minkowski = minkowski_distance
-    cosine = cosine_distance
-    hamming = hamming_distance
+Strategy = Literal['euclidean', 'manhattan', 'minkowski', 'cosine', 'hamming']
+
+strategies = {
+    'euclidean': euclidean_distance,
+    'manhattan': manhattan_distance,
+    'minkowski': minkowski_distance,
+    'cosine': cosine_distance,
+    'hamming': hamming_distance
+}

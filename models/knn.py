@@ -1,4 +1,4 @@
-from models.utils import Func
+from models.utils import Strategy, strategies
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -6,21 +6,19 @@ from sklearn.metrics import accuracy_score
 
 
 class KNN:
-    def __init__(self, strategy: Func = Func.euclidean, k: int = 2):
+    def __init__(self, k: int = 2, *, strategy: Strategy = strategies['euclidean']):
         """
          A KNN classifier.
         :param strategy: The distance function to use. Must be an instance of Func Enum.
         :param k: The number of neighbors to consider.
         """
 
-        if not isinstance(strategy, Func):
-            raise ValueError("Invalid strategy. Must be an instance of Func Enum.")
         if not isinstance(k, int) or k <= 0:
             raise ValueError("k must be a positive integer")
 
         self.y = None
         self.x = None
-        self.strategy = strategy.value
+        self.strategy = strategies[strategy]
         self.k = k
 
     def fit(self, x: pd.DataFrame, y: pd.Series):

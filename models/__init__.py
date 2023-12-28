@@ -1,2 +1,4 @@
-from .knn import KNN
-from kmeans import Kmeans
+from models.knn import KNN
+from models.kmeans import Kmeans
+from models.random_forest import RandomForest
+from models.tree import DecisionTree

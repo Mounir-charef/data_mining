@@ -2,13 +2,13 @@ import numpy as np
 from sklearn.decomposition import PCA
 import seaborn as sns
 import matplotlib.pyplot as plt
-from models.utils import Func
+from models.utils import strategies, Strategy
 
 
 class Kmeans:
-    def __init__(self, k: int, *, func: Func = Func.euclidean, random_state=None, max_iter=1000):
+    def __init__(self, k: int, *, func: Strategy = strategies['euclidean'], random_state=None, max_iter=1000):
         self.k = k
-        self.func = func.value
+        self.func = strategies[func]
         self.max_iter = max_iter
         self.random_state = random_state
         self.centroids = None
