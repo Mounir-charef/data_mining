@@ -1,4 +1,5 @@
 import numpy as np
+from models.metrics import metric_functions, Metric
 
 
 class DecisionTree:
@@ -67,10 +68,9 @@ class DecisionTree:
         gini = 1 - (p_0 ** 2 + p_1 ** 2)
         return gini
 
-    def score(self, x, y):
+    def score(self, x, y, *, metric: Metric = 'accuracy'):
         predictions = self.predict(x)
-        accuracy = np.sum(predictions == y) / len(y)
-        return accuracy
+        return metric_functions[metric](y, predictions)
 
     def predict(self, x):
         predictions = []
