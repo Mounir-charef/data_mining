@@ -6,9 +6,11 @@ import seaborn as sns
 Average = Literal['macro', 'micro', 'weighted', 'binary']
 
 
-def metrics_by_class(y_true, y_pred, classes):
+def metrics_by_class(y_true, y_pred, classes=None):
     metrics = {}
     matrices = {}
+    if classes is None:
+        classes = np.unique(y_true)
     for c in classes:
         tp = np.sum((y_true == c) & (y_pred == c))
         tn = np.sum((y_true != c) & (y_pred != c))
@@ -25,7 +27,7 @@ def metrics_by_class(y_true, y_pred, classes):
     return metrics, matrices
 
 
-def accuracy_score(y_true, y_pred, *kwargs):
+def accuracy_score(y_true, y_pred, **kwargs):
     return np.sum(y_true == y_pred) / len(y_true)
 
 

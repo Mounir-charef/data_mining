@@ -3,14 +3,11 @@ from models.metrics import metric_functions, Metric
 
 
 class DecisionTree:
-    def __init__(self, max_depth=150, max_features=None):
+    def __init__(self, max_depth=150):
         self.tree = None
         self.max_depth = max_depth
-        self.max_features = max_features
 
     def fit(self, x, y):
-        if self.max_features is not None:
-            x = x.sample(self.max_features, axis=1)
         self.tree = self._build_tree(x, y, 0)
 
     def _build_tree(self, x, y, depth):
@@ -53,7 +50,9 @@ class DecisionTree:
                 left_mask = x[feature] <= threshold
                 right_mask = ~left_mask
 
-                gini = self._calculate_gini_impurity(y[left_mask]) * len(y[left_mask]) / len(y) + self._calculate_gini_impurity(y[right_mask]) * len(y[right_mask]) / len(y)
+                gini = self._calculate_gini_impurity(y[left_mask]) \
+                       * len(y[left_mask]) / len(y) + self._calculate_gini_impurity(y[right_mask]) * len(
+                    y[right_mask]) / len(y)
 
                 if gini < best_gini:
                     best_gini = gini

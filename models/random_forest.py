@@ -5,10 +5,9 @@ from models.tree import DecisionTree
 
 
 class RandomForest:
-    def __init__(self, n_trees=100, max_depth=150, max_features=None):
+    def __init__(self, n_trees=100, max_depth=150):
         self.n_trees = n_trees
         self.max_depth = max_depth
-        self.max_features = max_features
         self.trees = []
 
     def fit(self, x, y):
@@ -17,7 +16,7 @@ class RandomForest:
             bootstrap_x, bootstrap_y = resample(x, y, replace=True)
 
             # Create a decision tree and fit it to the bootstrap sample
-            tree = DecisionTree(max_depth=self.max_depth, max_features=self.max_features)
+            tree = DecisionTree(max_depth=self.max_depth)
             tree.fit(bootstrap_x, bootstrap_y)
             self.trees.append(tree)
 
