@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
-from models import Kmeans
+from models import KMeans
 from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average, \
     silhouette_score
 from models.utils import Strategy
@@ -235,7 +235,7 @@ def kmeans_elbow(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
     """
     scores = []
     for k in tqdm(k_range):
-        model = Kmeans(k, random_state=42)
+        model = KMeans(k, random_state=42)
         model.fit(x_train)
         scores.append(silhouette_score(x_train, model.labels_, strategy=strategy))
     plt.plot(k_range, scores)

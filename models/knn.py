@@ -6,7 +6,7 @@ from models.metrics import metric_functions, Metric
 
 
 class KNN:
-    def __init__(self, k: int = 2, *, strategy: Strategy = strategies['euclidean']):
+    def __init__(self, k: int = 2, *, strategy: Strategy = 'euclidean'):
         """
          A KNN classifier.
         :param strategy: The distance function to use. Must be an instance of Func Enum.
