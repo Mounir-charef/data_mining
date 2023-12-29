@@ -69,6 +69,18 @@ class KMeans:
             if np.allclose(old_centroids, self.centroids):
                 break
 
+    def _predict(self, point: np.ndarray):
+        """
+        Predict the cluster label for a single data point.
+
+        Parameters:
+        - point (np.ndarray): Data point.
+
+        Returns:
+        """
+        distances = np.array([self.distance_metric(point, centroid) for centroid in self.centroids])
+        return np.argmin(distances)
+
     def predict(self, x: pd.DataFrame):
         """
         Predict the cluster labels for the input data.
@@ -77,10 +89,8 @@ class KMeans:
         """
         if self.centroids is None:
             raise Exception('You must fit the model first')
-        x = np.array(x)
 
-        distances = self.distance_metric(x[:, np.newaxis], self.centroids, axis=2)
-        return np.argmin(distances, axis=1)
+        return np.array([self._predict(x_i) for x_i in x.values])
 
     def score(self, x: pd.DataFrame, y: pd.DataFrame, metric: Metric = 'accuracy'):
         """
