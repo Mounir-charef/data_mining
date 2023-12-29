@@ -117,3 +117,7 @@ class KMeans:
         sns.scatterplot(x=reduced_centroids[:, 0], y=reduced_centroids[:, 1], color='black', marker='x', s=100)
 
         plt.show()
+
+    def __repr__(self):
+        return f'KMeans(num_clusters={self.num_clusters}, ' \
+               f'distance_metric={self.distance_metric.__name__}, max_iter={self.max_iter})'

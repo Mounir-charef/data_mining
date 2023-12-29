@@ -225,7 +225,7 @@ def grid_search_cv(model_cls, x_train: pd.DataFrame, y_train: pd.Series, param_g
     return pd.DataFrame(scores), {'best_score': best_score, 'best_params': best_params}
 
 
-def kmeans_elbow(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
+def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
     """
         plot the elbow method for kmeans
     :param x_train:
@@ -241,5 +241,5 @@ def kmeans_elbow(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
     plt.plot(k_range, scores)
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette score')
-    plt.title('Elbow Method')
+    plt.title('Silhouette scores for different number of clusters')
     plt.show()
