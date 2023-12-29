@@ -4,7 +4,10 @@ from typing import Iterable, get_args
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from tqdm import tqdm
+from models import Kmeans
 from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average
+from sklearn.metrics import silhouette_score
 
 
 class PlotType(Enum):
@@ -219,3 +222,22 @@ def grid_search_cv(model_cls, x_train: pd.DataFrame, y_train: pd.Series, param_g
             best_params = params
 
     return pd.DataFrame(scores), {'best_score': best_score, 'best_params': best_params}
+
+
+def kmeans_elbow(x_train, k_range: Iterable):
+    """
+        plot the elbow method for kmeans
+    :param x_train:
+    :param k_range:
+    :return:
+    """
+    scores = []
+    for k in tqdm(k_range):
+        model = Kmeans(k, random_state=42)
+        model.fit(x_train)
+        scores.append(silhouette_score(x_train, model.labels_))
+    plt.plot(k_range, scores)
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Silhouette score')
+    plt.title('Elbow Method')
+    plt.show()

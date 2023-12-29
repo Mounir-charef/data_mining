@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Literal
-import matplotlib.pyplot as plt
-import seaborn as sns
+
+from models.utils import Strategy, strategies
 
 Average = Literal['macro', 'micro', 'weighted', 'binary']
 
@@ -149,6 +149,27 @@ def print_confusion_matrix(y_true, y_pred, classes=None):
     print('  ' + ' '.join([f'{c:^4}' for c in classes]))
     for i, c1 in enumerate(classes):
         print(f'{c1} ' + ' '.join([f'{matrix[i][j]:^4}' for j, c2 in enumerate(classes)]))
+
+
+def silhouette_score(x, y_pred, *, strategy: Strategy = 'euclidean'):
+    """
+    Compute the silhouette score for a clustering.
+    :param x:
+    :param y_pred:
+    :param strategy:
+    :return:
+    """
+    func = strategies[strategy]
+    clusters = np.unique(y_pred)
+    if len(clusters) == 1:
+        return np.nan
+    score = 0
+    for i in range(len(x)):
+        a_i = np.mean([func(x[i], x[j]) for j in range(len(x)) if y_pred[j] == y_pred[i] and i != j])
+        b_i = np.min([np.mean([func(x[i], x[j]) for j in range(len(x)) if y_pred[j] == k])
+                      for k in clusters if k != y_pred[i]])
+        score += (b_i - a_i) / max(a_i, b_i)
+    return score / len(x)
 
 
 metric_functions = {
