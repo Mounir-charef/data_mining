@@ -3,6 +3,7 @@ from sklearn.decomposition import PCA
 import seaborn as sns
 import matplotlib.pyplot as plt
 from models.utils import strategies, Strategy
+from models.metrics import metric_functions, Metric
 
 
 class Kmeans:
@@ -30,7 +31,7 @@ class Kmeans:
         centroids = x[centroid_indices, :]
         return centroids
 
-    def fit(self, x: np.ndarray):
+    def fit(self, x: np.ndarray, y=None):
         def is_converged(old, new_centroids):
             return np.array_equal(old, new_centroids)
 
@@ -55,11 +56,11 @@ class Kmeans:
             clusters[i] = np.argmin([self.func(self.centroids[j], x[i]) for j in range(self.n_clusters)])
         return clusters
 
-    def score(self, y):
-        if self.centroids is None:
+    def score(self, x_test, y_test, *, metric: Metric = 'accuracy'):
+        if self.labels_ is None:
             raise Exception('You must fit the model first')
-        accuracy = np.mean(y == self.labels_) * 100
-        return accuracy
+
+        return metric_functions[metric](y_test, self.predict(x_test))
 
     def plot(self, x):
         if self.centroids is None:
@@ -73,3 +74,7 @@ class Kmeans:
         sns.scatterplot(x=reduced_centroids[:, 0], y=reduced_centroids[:, 1], color='black', marker='x', s=100)
 
         plt.show()
+
+    def __repr__(self):
+        return f'Kmeans(n_clusters={self.n_clusters}, func={self.func.__name__},' \
+               f' random_state={self.random_state}, max_iter={self.max_iter})'
