@@ -6,9 +6,9 @@ import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
 from models import KMeans
-from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average
+from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average,\
+    silhouette_score
 from models.utils import Strategy
-from sklearn.metrics import silhouette_score
 
 
 class PlotType(Enum):
@@ -237,7 +237,7 @@ def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euc
     for k in tqdm(k_range):
         model = KMeans(k, random_state=42, distance_metric=strategy)
         model.fit(x_train)
-        scores.append(silhouette_score(x_train, model.labels_, metric=strategy))
+        scores.append(silhouette_score(x_train, model.labels_, strategy=strategy))
     plt.plot(k_range, scores)
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette score')
