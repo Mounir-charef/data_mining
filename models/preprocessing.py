@@ -56,17 +56,6 @@ def custom_describe(input_df: pd.DataFrame):
     return result
 
 
-def to_numeric(input_df: pd.DataFrame) -> pd.DataFrame:
-    copy_df = input_df.copy()
-    for col in copy_df.columns:
-        try:
-            copy_df[col] = copy_df[col].astype(float)
-        except ValueError as e:
-            print(f'could not convert data on column "{col}" with error {e}')
-
-    return copy_df
-
-
 def remove_duplicates_from_dataframe(input_df: pd.DataFrame) -> pd.DataFrame:
     seen_rows = set()
     output_rows = []
@@ -105,8 +94,10 @@ def remove_rows_with_missing_values(input_df: pd.DataFrame, *, values=None) -> p
             np.nan,
         ]
     output_df = input_df.copy()
-    for column in output_df.columns:
-        output_df = output_df[~output_df[column].isin(values)]
+    output_df[output_df.isin(values)] = np.nan
+    output_df = output_df.astype(float)
+    column_means = output_df.mean()
+    output_df = output_df.fillna(pd.Series(column_means))
     return output_df
 
 
@@ -210,7 +201,6 @@ def treat_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
     copy_df = input_df.copy()
     copy_df = remove_duplicates_from_dataframe(copy_df)
     copy_df = remove_rows_with_missing_values(copy_df)
-    copy_df = to_numeric(copy_df)
     copy_df = treat_outliers(copy_df)
 
     y = copy_df[target_column]
