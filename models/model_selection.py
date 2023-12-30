@@ -1,11 +1,11 @@
 from enum import Enum
 from itertools import product
-from typing import Iterable, get_args
+from typing import Iterable, get_args, Literal
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from tqdm import tqdm
-from models import KMeans
+from models import KMeans, DBScan
 from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average,\
     silhouette_score
 from models.utils import Strategy
@@ -225,21 +225,24 @@ def grid_search_cv(model_cls, x_train: pd.DataFrame, y_train: pd.Series, param_g
     return pd.DataFrame(scores), {'best_score': best_score, 'best_params': best_params}
 
 
-def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
+def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euclidean',
+                           model: Literal['kmeans', 'dbscan'] = 'kmeans'):
     """
         plot the elbow method for kmeans
     :param x_train:
     :param k_range:
     :param strategy:
+    :param model:
     :return:
     """
     scores = []
     for k in tqdm(k_range):
-        model = KMeans(k, random_state=42, distance_metric=strategy)
+        model = KMeans(k, random_state=42, distance_metric=strategy) \
+            if model == 'kmeans' else DBScan(min_samples=k, strategy=strategy)
         model.fit(x_train)
         scores.append(silhouette_score(x_train, model.labels_, strategy=strategy))
     plt.plot(k_range, scores)
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette score')
-    plt.title('Silhouette scores for different number of clusters')
+    plt.title('Silhouette scores for different k values')
     plt.show()
