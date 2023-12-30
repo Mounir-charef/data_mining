@@ -32,7 +32,7 @@ class DBScan:
                 self.labels_[neighbor_index] = cluster_index
                 self._visit_neighbors(neighbor_index, x, cluster_index)
 
-    def fit(self, x: pd.DataFrame, n_components: int = 3):
+    def fit(self, x: pd.DataFrame, n_components: int = 2):
         x = np.array(x)
 
         # Perform PCA
@@ -78,5 +78,5 @@ class DBScan:
             plt.show()
 
     def __repr__(self):
-        return f"DBScan(min_samples={self.min_samples}, eps={self.eps}, strategy={self.strategy})"
+        return f"DBScan(min_samples={self.min_samples}, eps={self.eps}, strategy={self.strategy.__name__})"
 
