@@ -1,5 +1,6 @@
 import numpy as np
 from models.metrics import metric_functions, Metric
+import pandas as pd
 
 
 class DecisionTree:
@@ -76,11 +77,14 @@ class DecisionTree:
         predictions = self.predict(x)
         return metric_functions[metric](y, predictions)
 
-    def predict(self, x):
+    def predict(self, x: pd.DataFrame):
         predictions = []
         for _, row in x.iterrows():
             predictions.append(self._predict_single(row, self.tree))
-        return np.array(predictions)
+        return np.array(predictions, dtype=int)
+
+    def predict_single(self, x: pd.Series):
+        return int(self._predict_single(x, self.tree))
 
     def _predict_single(self, instance, node):
         if 'label' in node:

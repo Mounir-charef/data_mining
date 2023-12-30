@@ -37,8 +37,14 @@ class KNN:
     def predict(self, x: pd.DataFrame):
         if self.x is None or self.y is None:
             raise ValueError("Model has not been fitted yet.")
+        x = np.array(x)
+        return np.array([self._predict(x_i) for x_i in x])
 
-        return np.array([self._predict(x_i) for x_i in x.values])
+    def predict_single(self, x: pd.DataFrame):
+        if self.x is None or self.y is None:
+            raise ValueError("Model has not been fitted yet.")
+        x = np.array(x)
+        return self._predict(x)
 
     def _predict(self, point: np.array):
         distances = np.array([self.strategy(point, x_i) for x_i in self.x.values])

@@ -70,7 +70,7 @@ def remove_duplicates_from_dataframe(input_df: pd.DataFrame) -> pd.DataFrame:
     return output_df
 
 
-def remove_rows_with_missing_values(input_df: pd.DataFrame, *, values=None) -> pd.DataFrame:
+def treat_rows_with_missing_values(input_df: pd.DataFrame, *, values=None) -> pd.DataFrame:
     if values is None:
         values = [
             "",
@@ -200,8 +200,9 @@ def treat_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
     """
     copy_df = input_df.copy()
     copy_df = remove_duplicates_from_dataframe(copy_df)
-    copy_df = remove_rows_with_missing_values(copy_df)
+    copy_df = treat_rows_with_missing_values(copy_df)
     copy_df = treat_outliers(copy_df)
+    print(copy_df.describe())
 
     y = copy_df[target_column]
     x = copy_df.drop(columns=target_column)

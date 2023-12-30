@@ -1,12 +1,13 @@
 from enum import Enum
 from itertools import product
-from typing import Iterable, get_args, Literal
+from typing import Iterable, get_args
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from sklearn.decomposition import PCA
 from tqdm import tqdm
-from models import KMeans, DBScan
-from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average,\
+from models import KMeans
+from models.metrics import global_confusion_matrix, metric_functions, metrics_by_class, Metric, Average, \
     silhouette_score
 from models.utils import Strategy
 
@@ -39,11 +40,9 @@ def plot(input_df, *, plot_type: PlotType) -> None:
     plt.show()
 
 
-def heatmaps(x_train, y_train, x_test, y_test, models):
+def heatmaps(x_test, y_test, models):
     """
         plot the heatmaps of the models in a grid
-    :param x_train:
-    :param y_train:
     :param x_test:
     :param y_test:
     :param models:
@@ -54,7 +53,6 @@ def heatmaps(x_train, y_train, x_test, y_test, models):
     fig.suptitle('Heatmaps of the models')
 
     for i, model in enumerate(models):
-        model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
         matrix = global_confusion_matrix(y_test, y_pred)
         # plot the heatmap
@@ -88,11 +86,9 @@ def train_test_split(x: pd.DataFrame, y: pd.Series, test_size=0.2):
     return x_train, x_test, y_train, y_test
 
 
-def evaluate(x_train, y_train, x_test, y_test, models: list, metrics: Iterable, averages: Iterable):
+def evaluate(x_test, y_test, models: list, metrics: Iterable, averages: Iterable):
     """
         evaluate the models on the given metrics
-    :param x_train:
-    :param y_train:
     :param x_test:
     :param y_test:
     :param models:
@@ -102,7 +98,6 @@ def evaluate(x_train, y_train, x_test, y_test, models: list, metrics: Iterable, 
     """
     results = []
     for model in models:
-        model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
         result = {'model': str(model)}
         for metric in metrics:
@@ -115,11 +110,9 @@ def evaluate(x_train, y_train, x_test, y_test, models: list, metrics: Iterable, 
     return pd.DataFrame(results)
 
 
-def evaluate_by_class(x_train, y_train, x_test, y_test, models: list):
+def evaluate_by_class(x_test, y_test, models: list):
     """
         evaluate the models on the given metrics by class
-    :param x_train:
-    :param y_train:
     :param x_test:
     :param y_test:
     :param models:
@@ -127,7 +120,6 @@ def evaluate_by_class(x_train, y_train, x_test, y_test, models: list):
     """
     results = {}
     for model in models:
-        model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
         metrics, _ = metrics_by_class(y_test, y_pred)
         results[str(model)] = metrics
@@ -225,24 +217,76 @@ def grid_search_cv(model_cls, x_train: pd.DataFrame, y_train: pd.Series, param_g
     return pd.DataFrame(scores), {'best_score': best_score, 'best_params': best_params}
 
 
-def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euclidean',
-                           model: Literal['kmeans', 'dbscan'] = 'kmeans'):
+def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
     """
         plot the elbow method for kmeans
     :param x_train:
     :param k_range:
     :param strategy:
-    :param model:
     :return:
     """
     scores = []
     for k in tqdm(k_range):
-        model = KMeans(k, random_state=42, distance_metric=strategy) \
-            if model == 'kmeans' else DBScan(min_samples=k, strategy=strategy)
+        model = KMeans(k, random_state=42, distance_metric=strategy)
         model.fit(x_train)
         scores.append(silhouette_score(x_train, model.labels_, strategy=strategy))
     plt.plot(k_range, scores)
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette score')
     plt.title('Silhouette scores for different k values')
+    plt.show()
+
+
+def plot_cluster_by_model(x, y, title, input_models):
+    """
+        Plot in a grid the clusters of the data by each model after applying PCA
+        to reduce the dimensionality to 2D
+
+        :param x: data to be clustered
+        :param y: actual labels
+        :param title: title of the plot
+        :param input_models: list of models to be used for clustering, models must be fitted
+    """
+    n_models = len(input_models)
+    n_rows = 2
+    n_cols = (n_models + 2) // 2
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 15))
+    fig.suptitle(title, fontsize=16)  # Larger title font size
+
+    pca = PCA(n_components=2)
+    x_pca = pca.fit_transform(x)
+
+    for i, model in enumerate(input_models):
+        row_idx = i // n_cols
+        col_idx = i % n_cols
+        y_pred = model.predict(x)
+
+        sns.scatterplot(
+            ax=axes[row_idx, col_idx],
+            x=x_pca[:, 0],
+            y=x_pca[:, 1],
+            hue=y_pred,
+            palette='Set2',
+            s=80,  # Adjusted marker size
+            alpha=0.8,  # Partial transparency for better overlap visualization
+        )
+
+        axes[row_idx, col_idx].set_title(model.__class__.__name__, fontsize=12)
+        axes[row_idx, col_idx].legend(fontsize=10)
+
+    # Plot actual labels
+    sns.scatterplot(
+        ax=axes[-1, -1],
+        x=x_pca[:, 0],
+        y=x_pca[:, 1],
+        hue=y,
+        palette='Set2',
+        s=80,
+        alpha=0.8,
+    )
+
+    axes[-1, -1].set_title('Actual', fontsize=12)
+    axes[-1, -1].legend(fontsize=10)
+
+    plt.tight_layout()
     plt.show()

@@ -11,6 +11,8 @@ class DBScan:
         self.min_samples = min_samples
         self.eps = eps
         self.strategy = strategies[strategy]
+        self.X = None
+        self.pca = PCA(n_components=2)
 
     def _calculate_distance(self, x, point_index, y_index):
         return self.strategy(x[point_index], x[y_index])
@@ -36,18 +38,17 @@ class DBScan:
         x = np.array(x)
 
         # Perform PCA
-        pca = PCA(n_components=n_components)
-        reduced_x = pca.fit_transform(x)
+        self.X = self.pca.fit_transform(x)
 
         self.labels_ = np.full(shape=x.shape[0], fill_value=-1)
         cluster_index = 0
 
-        for point_index, point in enumerate(reduced_x):
+        for point_index, point in enumerate(self.X):
             if self.labels_[point_index] != -1:
                 continue
-            if self._is_core(point_index, reduced_x):
+            if self._is_core(point_index, self.X):
                 self.labels_[point_index] = cluster_index
-                self._visit_neighbors(point_index, reduced_x, cluster_index)
+                self._visit_neighbors(point_index, self.X, cluster_index)
                 cluster_index += 1
 
     def plot(self, x, ax=None):
@@ -69,7 +70,8 @@ class DBScan:
                            label=f'Cluster {label}', s=50)  # Adjust the 's' parameter here
             else:
                 cluster_indices = np.where(np.array(self.labels_) == label)
-                ax.scatter(reduced_x[cluster_indices, 0], reduced_x[cluster_indices, 1], label=f'Cluster {label}', s=50)  # Adjust the 's' parameter here
+                ax.scatter(reduced_x[cluster_indices, 0], reduced_x[cluster_indices, 1], label=f'Cluster {label}',
+                           s=50)  # Adjust the 's' parameter here
 
         ax.legend()
         ax.set_title(f'min_samples={self.min_samples}, eps={self.eps}, strategy={self.strategy.__name__}')
@@ -79,4 +81,3 @@ class DBScan:
 
     def __repr__(self):
         return f"DBScan(min_samples={self.min_samples}, eps={self.eps}, strategy={self.strategy.__name__})"
-

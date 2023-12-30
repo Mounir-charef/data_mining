@@ -92,6 +92,20 @@ class KMeans:
 
         return np.array([self._predict(x_i) for x_i in x.values])
 
+    def predict_single(self, x: pd.Series):
+        """
+        Predict the cluster label for a single data point.
+
+        Parameters:
+        - x (pd.Series): Data point.
+
+        Returns:
+        """
+        if self.centroids is None:
+            raise Exception('You must fit the model first')
+
+        return self._predict(x.values)
+
     def score(self, x: pd.DataFrame, y: pd.DataFrame, metric: Metric = 'accuracy'):
         """
         Calculate the inertia (sum of squared distances to the nearest centroid) as a score.

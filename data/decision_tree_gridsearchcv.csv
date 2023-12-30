@@ -1,0 +1,4 @@
+model,accuracy,precision,recall,f1-score,specificity
+DecisionTree(max_depth=10),0.860993,0.743811,0.738563,0.737687,0.915442
+DecisionTree(max_depth=50),0.869504,0.742441,0.709698,0.709865,0.923427
+DecisionTree(max_depth=100),0.868085,0.751495,0.750268,0.744528,0.922769

@@ -1,0 +1,10 @@
+model,accuracy,precision,recall,f1-score,specificity
+"RandomForest(n_trees=2, max_depth=10)",0.936170,0.870370,0.793110,0.816474,0.960385
+"RandomForest(n_trees=2, max_depth=50)",0.929078,0.885000,0.828781,0.848492,0.956516
+"RandomForest(n_trees=2, max_depth=100)",0.930496,0.877318,0.805688,0.824987,0.957894
+"RandomForest(n_trees=5, max_depth=10)",0.957447,0.955565,0.875650,0.895493,0.973952
+"RandomForest(n_trees=5, max_depth=50)",0.956028,0.928426,0.904874,0.911614,0.972244
+"RandomForest(n_trees=5, max_depth=100)",0.964539,0.975731,0.876965,0.903677,0.977212
+"RandomForest(n_trees=10, max_depth=10)",0.957447,0.948902,0.893303,0.914767,0.973628
+"RandomForest(n_trees=10, max_depth=50)",0.956028,0.928896,0.930089,0.914287,0.973089
+"RandomForest(n_trees=10, max_depth=100)",0.954610,0.924711,0.880073,0.897585,0.971510

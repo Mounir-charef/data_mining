@@ -1,0 +1,21 @@
+model,accuracy,precision,recall,f1-score,specificity
+"KNN(strategy=euclidean_distance, k=1)",0.724823,0.639825,0.572830,0.582310,0.831237
+"KNN(strategy=manhattan_distance, k=1)",0.717730,0.606283,0.622037,0.602654,0.827390
+"KNN(strategy=minkowski_distance, k=1)",0.729078,0.603903,0.586069,0.579978,0.834306
+"KNN(strategy=cosine_distance, k=1)",0.719149,0.595213,0.589924,0.588259,0.830666
+"KNN(strategy=hamming_distance, k=1)",0.557447,0.470760,0.441982,0.446246,0.726232
+"KNN(strategy=euclidean_distance, k=3)",0.773050,0.597685,0.588458,0.587200,0.856481
+"KNN(strategy=manhattan_distance, k=3)",0.770213,0.699907,0.589107,0.596409,0.856454
+"KNN(strategy=minkowski_distance, k=3)",0.778723,0.625739,0.563007,0.570433,0.859583
+"KNN(strategy=cosine_distance, k=3)",0.768794,0.604192,0.609739,0.588590,0.859847
+"KNN(strategy=hamming_distance, k=3)",0.594326,0.498526,0.460398,0.469274,0.745340
+"KNN(strategy=euclidean_distance, k=5)",0.791489,0.598512,0.562922,0.558800,0.866949
+"KNN(strategy=manhattan_distance, k=5)",0.801418,0.626904,0.579118,0.581177,0.873868
+"KNN(strategy=minkowski_distance, k=5)",0.777305,0.567124,0.560297,0.557396,0.859559
+"KNN(strategy=cosine_distance, k=5)",0.778723,0.625599,0.565498,0.567897,0.860702
+"KNN(strategy=hamming_distance, k=5)",0.611348,0.457198,0.440572,0.440016,0.750702
+"KNN(strategy=euclidean_distance, k=7)",0.784397,0.523030,0.549371,0.534700,0.862250
+"KNN(strategy=manhattan_distance, k=7)",0.791489,0.594645,0.562132,0.557929,0.866055
+"KNN(strategy=minkowski_distance, k=7)",0.801418,0.535494,0.559942,0.546949,0.872753
+"KNN(strategy=cosine_distance, k=7)",0.788652,0.561104,0.561707,0.556017,0.863575
+"KNN(strategy=hamming_distance, k=7)",0.634043,0.428880,0.437907,0.427858,0.761585

@@ -8,21 +8,33 @@ class RandomForest:
     def __init__(self, n_trees=100, max_depth=150):
         self.n_trees = n_trees
         self.max_depth = max_depth
-        self.trees = []
+        self.trees: list[DecisionTree] = []
 
     def fit(self, x, y):
         for _ in range(self.n_trees):
-            # Bootstrap sampling for creating a diverse set of trees
             bootstrap_x, bootstrap_y = resample(x, y, replace=True)
 
-            # Create a decision tree and fit it to the bootstrap sample
             tree = DecisionTree(max_depth=self.max_depth)
             tree.fit(bootstrap_x, bootstrap_y)
             self.trees.append(tree)
 
     def predict(self, x):
         predictions = np.array([tree.predict(x) for tree in self.trees])
-        return np.mean(predictions, axis=0) >= 0.5
+
+        majority_votes = np.apply_along_axis(
+            lambda current: np.bincount(current).argmax(), axis=0, arr=predictions
+        )
+
+        return majority_votes
+
+    def predict_single(self, x):
+        predictions = np.array([tree.predict_single(x) for tree in self.trees])
+
+        majority_votes = np.apply_along_axis(
+            lambda current: np.bincount(current).argmax(), axis=0, arr=predictions
+        )
+
+        return majority_votes
 
     def score(self, x, y, *, metric: Metric = 'accuracy'):
         predictions = self.predict(x)
