@@ -48,7 +48,9 @@ class KNN:
     def predict_single(self, x):
         if self.x is None or self.y is None:
             raise ValueError("Model has not been fitted yet.")
-        if isinstance(x, pd.DataFrame):
+        if len(x.shape) > 1:
+            x = x.reshape(-1)
+        if isinstance(x, pd.Series):
             x = x.values
         return self._predict(x)
 

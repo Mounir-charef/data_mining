@@ -92,6 +92,12 @@ class DecisionTree:
     def predict_single(self, x):
         if isinstance(x, pd.Series):
             x = x.values
+
+        if isinstance(x, list):
+            x = np.array(x)
+
+        if len(x.shape) > 1:
+            x = x.reshape(-1)
         return int(self._predict_single(x, self.tree))
 
     def _predict_single(self, instance, node):
