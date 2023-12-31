@@ -6,7 +6,7 @@ from models.utils import strategies, Strategy
 
 
 class DBScan:
-    def __init__(self, min_samples: int = 4, eps: float = 0.5, strategy: Strategy = "euclidean"):
+    def __init__(self, min_samples: int = 4, eps: float = 0.05, strategy: Strategy = "euclidean"):
         self.labels_ = None
         self.min_samples = min_samples
         self.eps = eps
