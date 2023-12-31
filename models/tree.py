@@ -9,27 +9,31 @@ class DecisionTree:
         self.max_depth = max_depth
 
     def fit(self, x, y):
+        if isinstance(x, pd.DataFrame):
+            x = x.values
+        if isinstance(y, pd.Series):
+            y = y.values
         self.tree = self._build_tree(x, y, 0)
 
     def _build_tree(self, x, y, depth):
         if len(np.unique(y)) == 1 or depth == self.max_depth or len(np.unique(y)) == 1:
             # If all labels are the same, create a leaf node or max depth reached or all labels are the same,
             # create a leaf node
-            return {'label': y.iloc[0]}
+            return {'label': y[0]}
 
-        if len(x.columns) == 0:
+        if x.shape[1] == 0:
             # If no features left, create a leaf node with the majority label
-            return {'label': y.mode().iloc[0]}
+            return {'label': np.argmax(np.bincount(y))}
 
         # Find the best split
         best_feature, best_threshold = self._find_best_split(x, y)
 
         if best_feature is None:
             # Unable to find a split, create a leaf node with the majority label
-            return {'label': y.mode().iloc[0]}
+            return {'label': np.argmax(np.bincount(y))}
 
         # Split the data based on the best feature and threshold
-        left_mask = x[best_feature] <= best_threshold
+        left_mask = x[:, best_feature] <= best_threshold
         right_mask = ~left_mask
 
         # Recursively build the left and right subtrees
@@ -45,15 +49,15 @@ class DecisionTree:
         best_feature = None
         best_threshold = None
 
-        for feature in x.columns:
-            thresholds = x[feature].unique()
+        for feature in range(x.shape[1]):
+            thresholds = np.unique(x[:, feature])
             for threshold in thresholds:
-                left_mask = x[feature] <= threshold
+                left_mask = x[:, feature] <= threshold
                 right_mask = ~left_mask
 
-                gini = self._calculate_gini_impurity(y[left_mask]) \
-                       * len(y[left_mask]) / len(y) + self._calculate_gini_impurity(y[right_mask]) * len(
-                    y[right_mask]) / len(y)
+                gini = (self._calculate_gini_impurity(y[left_mask])
+                        * len(y[left_mask]) / len(y) + self._calculate_gini_impurity(y[right_mask]) * len(
+                            y[right_mask]) / len(y))
 
                 if gini < best_gini:
                     best_gini = gini
@@ -77,13 +81,17 @@ class DecisionTree:
         predictions = self.predict(x)
         return metric_functions[metric](y, predictions)
 
-    def predict(self, x: pd.DataFrame):
+    def predict(self, x):
+        if isinstance(x, pd.DataFrame):
+            x = x.values
         predictions = []
-        for _, row in x.iterrows():
+        for row in x:
             predictions.append(self._predict_single(row, self.tree))
         return np.array(predictions, dtype=int)
 
-    def predict_single(self, x: pd.Series):
+    def predict_single(self, x):
+        if isinstance(x, pd.Series):
+            x = x.values
         return int(self._predict_single(x, self.tree))
 
     def _predict_single(self, instance, node):
