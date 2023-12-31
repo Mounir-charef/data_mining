@@ -21,7 +21,7 @@ class KNN:
         self.strategy = strategies[strategy]
         self.k = k
 
-    def fit(self, x: pd.DataFrame, y: pd.Series):
+    def fit(self, x, y):
         """
         Fit the model to the data.
         :param x: The training data.
@@ -30,26 +30,32 @@ class KNN:
         """
         if len(x) != len(y):
             raise ValueError("x and y must have the same length")
+        if isinstance(x, pd.DataFrame):
+            x = x.values
+        if isinstance(y, pd.Series):
+            y = y.values
 
         self.x = x
         self.y = y
 
-    def predict(self, x: pd.DataFrame):
+    def predict(self, x):
         if self.x is None or self.y is None:
             raise ValueError("Model has not been fitted yet.")
-        x = np.array(x)
+        if isinstance(x, pd.DataFrame):
+            x = x.values
         return np.array([self._predict(x_i) for x_i in x])
 
-    def predict_single(self, x: pd.DataFrame):
+    def predict_single(self, x):
         if self.x is None or self.y is None:
             raise ValueError("Model has not been fitted yet.")
-        x = np.array(x)
+        if isinstance(x, pd.DataFrame):
+            x = x.values
         return self._predict(x)
 
     def _predict(self, point: np.array):
-        distances = np.array([self.strategy(point, x_i) for x_i in self.x.values])
+        distances = np.array([self.strategy(point, x_i) for x_i in self.x])
         indexes = np.argsort(distances)[:self.k]
-        return Counter(self.y.values[indexes]).most_common(1)[0][0]
+        return Counter(self.y[indexes]).most_common(1)[0][0]
 
     def score(self, x: pd.DataFrame, y: pd.Series, *, metric: Metric = 'accuracy'):
         if self.x is None or self.y is None:
