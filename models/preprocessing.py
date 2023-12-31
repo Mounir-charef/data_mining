@@ -2,8 +2,11 @@ import numpy as np
 import pandas as pd
 from typing import Literal
 from collections import Counter
-
 from pandas import DataFrame
+
+from sklearn import preprocessing
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 def custom_describe(input_df: pd.DataFrame):
@@ -202,7 +205,6 @@ def treat_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
     copy_df = remove_duplicates_from_dataframe(copy_df)
     copy_df = treat_rows_with_missing_values(copy_df)
     copy_df = treat_outliers(copy_df)
-    print(copy_df.describe())
 
     y = copy_df[target_column]
     x = copy_df.drop(columns=target_column)
@@ -215,3 +217,52 @@ def treat_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
         raise ValueError('Normalization must be one of "minmax" or "z-score".')
 
     return x, y
+
+
+def treat_input_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
+                     normalization: Literal['minmax', 'z-score'] = 'z-score') -> \
+        tuple[DataFrame, pd.Series, MinMaxScaler | StandardScaler]:
+    """
+        Perform data treatment on a pandas DataFrame.
+
+        Parameters:
+        dataframe (pandas.DataFrame): The input DataFrame.
+        normalization (str): The normalization method to use. Must be one of 'minmax' or 'z-score'.
+
+        Returns:
+        tuple[DataFrame, pd.Series]: DataFrame with values treated.
+        """
+    copy_df = input_df.copy()
+
+    # Remove duplicates
+    copy_df = remove_duplicates_from_dataframe(copy_df)
+
+    # Treat rows with missing values
+    copy_df = treat_rows_with_missing_values(copy_df)
+
+    # Treat outliers
+    copy_df = treat_outliers(copy_df)
+
+    y = copy_df[target_column]
+    x = copy_df.drop(columns=target_column)
+
+    # Initialize the imputer
+    imputer = SimpleImputer(strategy='mean')
+
+    # Impute missing values
+    x_imputed = imputer.fit_transform(x)
+
+    if normalization == 'minmax':
+        scaler = preprocessing.MinMaxScaler()
+    elif normalization == 'z-score':
+        scaler = preprocessing.StandardScaler()
+    else:
+        raise ValueError('Normalization must be one of "minmax" or "z-score".')
+
+    # Apply normalization to features
+    x_normalized = scaler.fit_transform(x_imputed)
+
+    # Convert back to DataFrame
+    x_normalized_df = x_normalized
+
+    return x_normalized_df, y, scaler
