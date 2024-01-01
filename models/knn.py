@@ -1,8 +1,8 @@
-from models.utils import Strategy, strategies
-import pandas as pd
 import numpy as np
-from collections import Counter
+import pandas as pd
+
 from models.metrics import metric_functions, Metric
+from models.utils import Strategy, strategies
 
 
 class KNN:
@@ -56,8 +56,9 @@ class KNN:
 
     def _predict(self, point: np.array):
         distances = np.array([self.strategy(point, x_i) for x_i in self.x])
-        indexes = np.argsort(distances)[:self.k]
-        return Counter(self.y[indexes]).most_common(1)[0][0]
+        indexes = np.argpartition(distances, self.k)[:self.k]
+        unique_classes, counts = np.unique(self.y[indexes], return_counts=True)
+        return unique_classes[np.argmax(counts)]
 
     def score(self, x: pd.DataFrame, y: pd.Series, *, metric: Metric = 'accuracy'):
         if self.x is None or self.y is None:
