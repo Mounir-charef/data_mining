@@ -43,7 +43,7 @@ class KNN:
             raise ValueError("Model has not been fitted yet.")
         if isinstance(x, pd.DataFrame):
             x = x.values
-        return np.array([self._predict(x_i) for x_i in x])
+        return np.array([self._predict(x_i) for x_i in x], dtype='int')
 
     def predict_single(self, x):
         if self.x is None or self.y is None:

@@ -206,7 +206,7 @@ def treat_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility',
     copy_df = treat_rows_with_missing_values(copy_df)
     copy_df = treat_outliers(copy_df)
 
-    y = copy_df[target_column]
+    y = copy_df[target_column].astype(int)
     x = copy_df.drop(columns=target_column)
 
     if normalization == 'minmax':
@@ -243,7 +243,7 @@ def treat_input_data(input_df: pd.DataFrame, *, target_column: str = 'Fertility'
     # Treat outliers
     copy_df = treat_outliers(copy_df)
 
-    y = copy_df[target_column]
+    y = copy_df[target_column].astype(int)
     x = copy_df.drop(columns=target_column)
 
     # Initialize the imputer
