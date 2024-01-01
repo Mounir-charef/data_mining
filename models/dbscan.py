@@ -58,14 +58,16 @@ class DBScan:
         if self.labels_ is None:
             raise Exception('You must fit the model first')
 
+        reduced_data = self.pca.fit_transform(self.X)
+
         for label in np.unique(self.labels_):
             if label == -1:
                 outliers_indices = np.where(np.array(self.labels_) == label)
-                ax.scatter(self.X[outliers_indices, 0], self.X[outliers_indices, 1], c='black', marker='x',
+                ax.scatter(reduced_data[outliers_indices, 0], reduced_data[outliers_indices, 1], c='black', marker='x',
                            label=f'Cluster {label}', s=50)
             else:
                 cluster_indices = np.where(np.array(self.labels_) == label)
-                ax.scatter(self.X[cluster_indices, 0], self.X[cluster_indices, 1], label=f'Cluster {label}',
+                ax.scatter(reduced_data[cluster_indices, 0], reduced_data[cluster_indices, 1], label=f'Cluster {label}',
                            s=50)
 
         ax.legend()
