@@ -221,7 +221,10 @@ else:
     predict_button = False
 
 if fit_button:
-    model_instance.fit(X, y)
+    if models[selected_model]['type'] == 'supervised':
+        model_instance.fit(X, y)
+    else:
+        model_instance.fit(X)
     st.session_state['model'] = model_instance
     st.success(f"{selected_model} has been fitted with the data.")
     if 'fig' in st.session_state:

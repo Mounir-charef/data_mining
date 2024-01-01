@@ -34,11 +34,9 @@ class DBScan:
                 self.labels_[neighbor_index] = cluster_index
                 self._visit_neighbors(neighbor_index, x, cluster_index)
 
-    def fit(self, x: pd.DataFrame, n_components: int = 2):
+    def fit(self, x: pd.DataFrame):
         x = np.array(x)
-
-        # Perform PCA
-        self.X = self.pca.fit_transform(x)
+        self.X = x
 
         self.labels_ = np.full(shape=x.shape[0], fill_value=-1)
         cluster_index = 0
@@ -51,7 +49,7 @@ class DBScan:
                 self._visit_neighbors(point_index, self.X, cluster_index)
                 cluster_index += 1
 
-    def plot(self, x, ax=None):
+    def plot(self, ax=None):
         if ax is None:
             fig, ax = plt.subplots(figsize=(8, 6))
         else:
@@ -60,18 +58,15 @@ class DBScan:
         if self.labels_ is None:
             raise Exception('You must fit the model first')
 
-        pca = PCA(n_components=2)
-        reduced_x = pca.fit_transform(x)
-
         for label in np.unique(self.labels_):
             if label == -1:
                 outliers_indices = np.where(np.array(self.labels_) == label)
-                ax.scatter(reduced_x[outliers_indices, 0], reduced_x[outliers_indices, 1], c='black', marker='x',
-                           label=f'Cluster {label}', s=50)  # Adjust the 's' parameter here
+                ax.scatter(self.X[outliers_indices, 0], self.X[outliers_indices, 1], c='black', marker='x',
+                           label=f'Cluster {label}', s=50)
             else:
                 cluster_indices = np.where(np.array(self.labels_) == label)
-                ax.scatter(reduced_x[cluster_indices, 0], reduced_x[cluster_indices, 1], label=f'Cluster {label}',
-                           s=50)  # Adjust the 's' parameter here
+                ax.scatter(self.X[cluster_indices, 0], self.X[cluster_indices, 1], label=f'Cluster {label}',
+                           s=50)
 
         ax.legend()
         ax.set_title(f'min_samples={self.min_samples}, eps={self.eps}, strategy={self.strategy.__name__}')
