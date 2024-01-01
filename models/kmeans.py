@@ -26,7 +26,20 @@ class KMeans:
         self.max_iter = max_iter
         self.random_state = random_state
         self.centroids = None
-        self.labels_ = None
+        self._labels = None
+        self._inertia = None
+
+    @property
+    def labels_(self):
+        if self._labels is None:
+            raise Exception('You must fit the model first')
+        return self._labels
+
+    @property
+    def inertia_(self):
+        if self._inertia is None:
+            raise Exception('You must fit the model first')
+        return self._inertia
 
     def _initialize_random_centroids(self, x: np.ndarray):
         centroids = np.zeros((self.num_clusters, x.shape[1]))
@@ -46,11 +59,11 @@ class KMeans:
     def _assign_labels(self, x: np.ndarray):
         for point in range(x.shape[0]):
             distances = np.array([self.distance_metric(x[point], centroid) for centroid in self.centroids])
-            self.labels_[point] = np.argmin(distances)
+            self._labels[point] = np.argmin(distances)
 
     def _update_centroids(self, x: np.ndarray):
         for i in range(self.num_clusters):
-            self.centroids[i] = np.mean(x[self.labels_ == i], axis=0)
+            self.centroids[i] = np.mean(x[self._labels == i], axis=0)
 
     def fit(self, x: pd.DataFrame, y=None):
         """
@@ -61,13 +74,18 @@ class KMeans:
         """
         x = np.array(x)
         self.centroids = self._initialize_centroids(x)
-        self.labels_ = np.zeros(x.shape[0], dtype=int)
+        self._labels = np.zeros(x.shape[0], dtype=int)
         for _ in range(self.max_iter):
             old_centroids = self.centroids.copy()
             self._assign_labels(x)
             self._update_centroids(x)
             if np.allclose(old_centroids, self.centroids):
                 break
+
+        self._inertia = 0
+        for point in range(x.shape[0]):
+            distances = np.array([self.distance_metric(x[point], centroid) for centroid in self.centroids])
+            self._inertia += np.min(distances)
 
     def _predict(self, point: np.ndarray):
         """
@@ -127,7 +145,7 @@ class KMeans:
         reduced_x = pca.fit_transform(x)
         reduced_centroids = pca.transform(self.centroids)
 
-        sns.scatterplot(x=reduced_x[:, 0], y=reduced_x[:, 1], hue=self.labels_, palette='bright')
+        sns.scatterplot(x=reduced_x[:, 0], y=reduced_x[:, 1], hue=self._labels, palette='bright')
         sns.scatterplot(x=reduced_centroids[:, 0], y=reduced_centroids[:, 1], color='black', marker='x', s=100)
 
         plt.show()

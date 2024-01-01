@@ -237,6 +237,26 @@ def plot_silhouette_scores(x_train, k_range: range, *, strategy: Strategy = 'euc
     plt.show()
 
 
+def plot_elbow_method(x_train, k_range: range, *, strategy: Strategy = 'euclidean'):
+    """
+        plot the elbow method for kmeans
+    :param x_train:
+    :param k_range:
+    :param strategy:
+    :return:
+    """
+    scores = []
+    for k in tqdm(k_range):
+        model = KMeans(k, random_state=42, distance_metric=strategy)
+        model.fit(x_train)
+        scores.append(model.inertia_)
+    plt.plot(k_range, scores)
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Inertia')
+    plt.title('Elbow method for different k values')
+    plt.show()
+
+
 def plot_cluster_by_model(x, y, title, input_models):
     """
         Plot in a grid the clusters of the data by each model after applying PCA

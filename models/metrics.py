@@ -1,6 +1,8 @@
 import numpy as np
 from typing import Literal
 
+import pandas as pd
+
 from models.utils import Strategy, strategies
 
 Average = Literal['macro', 'micro', 'weighted', 'binary']
@@ -39,7 +41,7 @@ def precision_score(y_true, y_pred, *, average: Average = 'macro'):
         case 'macro':
             return np.mean([metrics[c]['precision'] for c in classes])
         case 'micro':
-            matrix = np.sum([matrices[c] for c in classes], axis=0)
+            matrix = np.sum(np.array([matrices[c] for c in classes]), axis=0)
             tp = matrix[0][0]
             fp = matrix[0][1]
             return tp / (tp + fp)
@@ -63,7 +65,7 @@ def recall_score(y_true, y_pred, *, average: Average = 'macro'):
         case 'macro':
             return np.mean([metrics[c]['recall'] for c in classes])
         case 'micro':
-            matrix = np.sum([matrices[c] for c in classes], axis=0)
+            matrix = np.sum(np.array([matrices[c] for c in classes]), axis=0)
             tp = matrix[0][0]
             fn = matrix[1][0]
             return tp / (tp + fn)
@@ -87,7 +89,7 @@ def f1_score(y_true, y_pred, *, average: Average = 'macro'):
         case 'macro':
             return np.mean([metrics[c]['f1-score'] for c in classes])
         case 'micro':
-            matrix = np.sum([matrices[c] for c in classes], axis=0)
+            matrix = np.sum(np.array([matrices[c] for c in classes]), axis=0)
             tp = matrix[0][0]
             fp = matrix[0][1]
             fn = matrix[1][0]
@@ -113,7 +115,7 @@ def specificity_score(y_true, y_pred, *, average: Average = 'macro'):
         case 'macro':
             return np.mean([metrics[c]['specificity'] for c in classes])
         case 'micro':
-            matrix = np.sum([matrices[c] for c in classes], axis=0)
+            matrix = np.sum(np.array([matrices[c] for c in classes]), axis=0)
             tn = matrix[1][1]
             fp = matrix[0][1]
             return tn / (tn + fp)
@@ -151,7 +153,7 @@ def print_confusion_matrix(y_true, y_pred, classes=None):
         print(f'{c1} ' + ' '.join([f'{matrix[i][j]:^4}' for j, c2 in enumerate(classes)]))
 
 
-def silhouette_score(x, y_pred, *, strategy: Strategy = 'euclidean'):
+def silhouette_score(x: np.array, y_pred, *, strategy: Strategy = 'euclidean'):
     """
     Compute the silhouette score for a clustering.
     :param x:
@@ -159,6 +161,11 @@ def silhouette_score(x, y_pred, *, strategy: Strategy = 'euclidean'):
     :param strategy:
     :return:
     """
+    if isinstance(x, pd.DataFrame):
+        x = x.values
+    if not isinstance(x, np.ndarray):
+        raise TypeError('x must be a numpy array or a pandas DataFrame')
+
     func = strategies[strategy]
     clusters = np.unique(y_pred)
     if len(clusters) == 1:

@@ -16,7 +16,7 @@ class DecisionTree:
         self.tree = self._build_tree(x, y, 0)
 
     def _build_tree(self, x, y, depth):
-        if len(np.unique(y)) == 1 or depth == self.max_depth or len(np.unique(y)) == 1:
+        if len(np.unique(y)) == 1 or depth == self.max_depth:
             # If all labels are the same, create a leaf node or max depth reached or all labels are the same,
             # create a leaf node
             return {'label': y[0]}
