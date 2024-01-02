@@ -40,7 +40,7 @@ def plot(input_df, *, plot_type: PlotType) -> None:
     plt.show()
 
 
-def heatmaps(x_test, y_test, models):
+def confusion_matrices(x_test, y_test, models):
     """
         plot the heatmaps of the models in a grid
     :param x_test:
