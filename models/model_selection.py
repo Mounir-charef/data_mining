@@ -86,7 +86,7 @@ def train_test_split(x: pd.DataFrame, y: pd.Series, test_size=0.2):
     return x_train, x_test, y_train, y_test
 
 
-def evaluate(x_test, y_test, models: list, metrics: Iterable[Metric], averages: Iterable):
+def evaluate(x_test, y_test, models: list, metrics: Iterable[Metric], averages: Iterable[Average]):
     """
         evaluate the models on the given metrics
     :param x_test:
